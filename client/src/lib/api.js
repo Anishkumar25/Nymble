@@ -1,4 +1,6 @@
 const JWT_KEY = 'nymble.jwt';
+// Empty in dev (Vite proxies /api). In production set VITE_API_URL to the backend origin, e.g. https://nymble-api.onrender.com
+const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
 
 export const getJwt = () => localStorage.getItem(JWT_KEY);
 export const setJwt = (t) => localStorage.setItem(JWT_KEY, t);
@@ -25,7 +27,7 @@ export async function api(path, { method = 'GET', body, headers = {} } = {}) {
   const jwt = getJwt();
   let res;
   try {
-    res = await fetch(`/api${path}`, {
+    res = await fetch(`${API_BASE}/api${path}`, {
       method,
       headers: { ...(body ? { 'Content-Type': 'application/json' } : {}), ...(jwt ? { Authorization: `Bearer ${jwt}` } : {}), ...headers },
       body: body ? JSON.stringify(body) : undefined,

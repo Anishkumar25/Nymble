@@ -8,8 +8,9 @@ const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 app.disable('x-powered-by');
+app.set('trust proxy', 1); // behind Render's proxy, so rate limiting sees real client IPs
 app.use(helmet());
-app.use(cors({ origin: cfg.clientOrigin.split(',').map((s) => s.trim()) }));
+app.use(cors({ origin: cfg.clientOrigin.split(',').map((s) => s.trim().replace(/\/+$/, '')) }));
 app.use(express.json({ limit: '20kb' }));
 app.use(morgan(cfg.isProd ? 'combined' : 'dev'));
 app.use('/api', rateLimit({ windowMs: 60 * 1000, limit: 600, standardHeaders: true, legacyHeaders: false }));
